@@ -171,12 +171,19 @@ def get_params():
 		print "[<<]",action
 		if action == "SEND":
 			path=raw_input("[#] SOURCE FOLDER? (default=current,not recursive!) \n[<<] ")
+			path='.' if path=='' or path=="current" else path
+			while(not os.path.isdir(path)):
+				print "[!] SORRY, NOT A FOLDER. TRY AGAIN!"
+				path=raw_input("[#] SOURCE FOLDER? (default=current,not recursive!) \n[<<] ")
+
 			if path =='':
 				path='./'
 			elif path[-1]!='/':
 				path+='/'
 			else:
 				pass
+
+
 			
 			print(CURSOR_UP_ONE + ERASE_LINE + CURSOR_UP_ONE)
 			print "[<<]",path
@@ -249,7 +256,7 @@ if __name__ == "__main__":
 		show_record(record)
 
 		prompt=raw_input("\n[#] RECEIVE THESE FILES? (y/n): \n[<<] ")
-		prompt='YES' if ('y' in prompt )or( 'Y' in prompt) else 'NO'
+		prompt='YES' if prompt in ['y','Y','YES','yes',''] else 'NO'
 		print(CURSOR_UP_ONE + ERASE_LINE + CURSOR_UP_ONE)
 		print "[<<]",prompt
 		if prompt=='YES':
