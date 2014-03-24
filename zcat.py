@@ -19,14 +19,14 @@ __+[USAGE]+____
 sender must start zcat first, inform the receiver ur IP
 and start zcat at the receivers end!
 
+interactive mode (prefered):
+	python zcat.py
+
 send files:
 	python zcat.py -s <path-to-folder>
 
 receive files:	
 	python zcat.py -r <host-ip>
-
-interactive mode:
-	python zcat.py
 
 
 """
@@ -36,6 +36,10 @@ import re
 import sys
 import socket
 
+
+CURSOR_UP_ONE = '\x1b[1A'
+ERASE_LINE = '\x1b[2K'
+#----------------------------------------------
 
 def zcat_send_record(record_fileName,portNum):
 	command="nc -l "+str(portNum)+" <"+record_fileName
@@ -146,8 +150,6 @@ def get_params():
 	host=''
 	message="file list..."
 	port=1200
-	CURSOR_UP_ONE = '\x1b[1A'
-	ERASE_LINE = '\x1b[2K'
 
 
 	if len(sys.argv)>1:
@@ -250,10 +252,12 @@ if __name__ == "__main__":
 		show_record(record)
 
 		prompt=raw_input("\n[#] RECEIVE THESE FILES? (y/n): \n[<<] ")
-		if prompt=='y':
+		prompt='YES' if ('y' in prompt )or( 'Y' in prompt) else 'NO'
+		print(CURSOR_UP_ONE + ERASE_LINE + CURSOR_UP_ONE)
+		print "[<<]",prompt
+		if prompt=='YES':
 			zcat_get_files(record,host)
-			print  TRANSFER COMPLETE!"
+			print  "[:)]TRANSFER COMPLETE!"
 		else:
+			print "[!!] tell your friend to run `pkill nc` to close all ports he opened for you!"
 
-
-			pass
