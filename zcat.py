@@ -30,8 +30,11 @@ interactive mode:
 
 
 """
-import subprocess,os
+import subprocess
+import os
+import re
 import sys
+import socket
 
 
 def zcat_send_record(record_fileName,portNum):
@@ -42,6 +45,7 @@ def zcat_send_record(record_fileName,portNum):
 def zcat_send_files(record,initPortNum):
 		
 	for portNum,fileName in record.items():
+		
 		command="nc -l "+str(portNum)+" <"+fileName
 		process=subprocess.Popen(command,shell=True, stdout=subprocess.PIPE)
 
@@ -76,7 +80,9 @@ def zcat_get_record(record_fileName,host,portNum):
 def zcat_get_files(record,host):
 
 	for portNum,fileName in record.items():
-		print "[*]fetching",fileName.split("/")[-1],
+		fileName=fileName.split("/")[-1]
+		fileName='"'+fileName
+		print fileName,
 		sys.stdout.flush()
 		command="nc "+host+" "+str(portNum)+" >"+fileName
 		process=subprocess.Popen(command,shell=True, stdout=subprocess.PIPE)
@@ -103,14 +109,17 @@ def make_record(path,initPortNum,record_fileName="record",message="file list..."
 	record_obj=open(record_fileName,"w")
 
 	record_obj.write(message+'\n')
-	selectAll=raw_input("[#] SELECT ALL FILES IN "+path+'(y/n)\n[<<] ')
+	selectAll=raw_input("[#] SELECT ALL FILES IN "+path+' (y/n)\n[<<] ')
 	selectAll=True if selectAll in ['yes','YES','y','Y',''] else False
 
-	print files
 	for file in files:
 
-		if file == record_fileName or file[0]=='.':
+		if file == record_fileName or file[0]=='.' or '.py' in file:
 			continue
+
+		file=path+file
+		file='"'+file+'"'
+
 		print "[#] file: ",file
 		if not selectAll:
 			prompt=raw_input("[#] SELECT? (y/n)\n[<<] ")
@@ -119,7 +128,7 @@ def make_record(path,initPortNum,record_fileName="record",message="file list..."
 				continue
 
 		record[portNum]=file
-		record_obj.write(str(portNum)+":"+path+file+'\n')
+		record_obj.write(str(portNum)+":"+file+'\n')
 		portNum+=1
 
 
@@ -137,6 +146,10 @@ def get_params():
 	host=''
 	message="file list..."
 	port=1200
+	CURSOR_UP_ONE = '\x1b[1A'
+	ERASE_LINE = '\x1b[2K'
+
+
 	if len(sys.argv)>1:
 		if sys.argv[1]=='-s':
 			action='SEND'
@@ -155,6 +168,8 @@ def get_params():
 	else:
 		action=raw_input("[#] SEND or RECEIVE?\n[<<] ")
 		action = "SEND" if (action in ['SEND','send','s','S']) else "RECEIVE"
+		print(CURSOR_UP_ONE + ERASE_LINE + CURSOR_UP_ONE)
+		print "[<<]",action
 		if action == "SEND":
 			path=raw_input("[#] SOURCE FOLDER? \n[<<] ")
 			if path =='':
@@ -163,17 +178,32 @@ def get_params():
 				path+='/'
 			else:
 				pass
-
+			
+			print(CURSOR_UP_ONE + ERASE_LINE + CURSOR_UP_ONE)
+			print "[<<]",path
 			path=path+'/' if path[-1] != '/' else path
 			port=raw_input("[#] PORT? (default=1200) \n[<<]")
 			port = 1200 if (port =='' or int(port)<=1000) else int(port)
+
+			print(CURSOR_UP_ONE + ERASE_LINE + CURSOR_UP_ONE)
+			print "[<<]",port
 			message=raw_input("[#] MESSAGE? \n[<<] ")
 			message="hi.. i am sending u these" if message == '' else message
+			print(CURSOR_UP_ONE + ERASE_LINE + CURSOR_UP_ONE)
+			print "[<<]",message
+
+			ip=get_machine_ip()
+			print "[#] YOUR IP:",ip,"(pass this to the receiver)"
 		else:
 			host=raw_input("[#] HOST IP? \n[<<] ")
 			host = "localhost" if host=='' else host
+
+			print(CURSOR_UP_ONE + ERASE_LINE + CURSOR_UP_ONE)
+			print "[<<]",host
 			port=raw_input("[#] PORT? (default=1200) \n[<<]")
 			port = 1200 if (port =='' or int(port)<=1000) else int(port)
+			print(CURSOR_UP_ONE + ERASE_LINE + CURSOR_UP_ONE)
+			print "[<<]",port
 
 
 
@@ -187,7 +217,16 @@ def show_record(record):
 
 	print ""
 	
-	
+
+def get_machine_ip():
+	"""
+	"""
+
+	s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+	s.connect(("gmail.com",80))
+	IP=(s.getsockname()[0])
+	s.close()
+	return IP
 
 if __name__ == "__main__":
 
@@ -213,7 +252,7 @@ if __name__ == "__main__":
 		prompt=raw_input("\n[#] RECEIVE THESE FILES? (y/n): \n[<<] ")
 		if prompt=='y':
 			zcat_get_files(record,host)
-			print "[:)] TRANSFER COMPLETE!"
+			print  TRANSFER COMPLETE!"
 		else:
 
 
