@@ -12,6 +12,9 @@ to tar/compress the files.
 ZCAT bridges this gap by allowing you to send multiple files in one go!
 ZCAT uses nc!
 
+___+[NOTE]+_______
+As of now doesnt handle nested directories (not recursive)
+
 __+[REQUIREMNTS]+_____
 python, nc, therefore linux!
 
@@ -110,10 +113,10 @@ def make_record(path,initPortNum,record_fileName="record",message="file list..."
 	record_obj=open(record_fileName,"w")
 
 	record_obj.write(message+'\n')
-	selectAll=raw_input("[#] SELECT ALL FILES IN "+path+' (y/n)\n[<<] ')
+	selectAll=raw_input("[>>] SELECT ALL FILES IN "+path+' (y/n)\n[<<]\t ')
 	selectAll=True if selectAll in ['yes','YES','y','Y',''] else False
 	print(CURSOR_UP_ONE + ERASE_LINE + CURSOR_UP_ONE)
-	print "[<<]","YES" if selectAll else "NO"
+	print "[<<]\t","YES" if selectAll else "NO"
 
 	for file in files:
 
@@ -123,12 +126,12 @@ def make_record(path,initPortNum,record_fileName="record",message="file list..."
 		file=path+file
 		file='"'+file+'"'
 
-		print "[#] file: ",file
+		print "[>>] file: ",file
 		if not selectAll:
-			prompt=raw_input("\t[#] SELECT? (y/n)\n\t[<<] ")
+			prompt=raw_input("\t[>>] SELECT? (y/n)\n\t[<<]\t ")
 			prompt='NO' if prompt in ['n','N','NO','no'] else 'YES'
 			print(CURSOR_UP_ONE + ERASE_LINE + CURSOR_UP_ONE)
-			print "\t[<<]",prompt
+			print "\t[<<]\t",prompt
 			if prompt=='no':
 				continue
 
@@ -169,16 +172,16 @@ def get_params():
 				sys.exit()
 		pass
 	else:
-		action=raw_input("[#] SEND or RECEIVE?\n[<<] ")
+		action=raw_input("[>>] SEND or RECEIVE?\n[<<]\t ")
 		action = "SEND" if (action in ['SEND','send','s','S']) else "RECEIVE"
 		print(CURSOR_UP_ONE + ERASE_LINE + CURSOR_UP_ONE)
-		print "[<<]",action
+		print "[<<]\t",action
 		if action == "SEND":
-			path=raw_input("[#] SOURCE FOLDER? (default=current,not recursive!) \n[<<] ")
+			path=raw_input("[>>] SOURCE FOLDER? (default=current,not recursive!) \n[<<]\t ")
 			path='.' if path=='' or path=="current" else path
 			while(not os.path.isdir(path)):
 				print "[!] SORRY, NOT A FOLDER. TRY AGAIN!"
-				path=raw_input("[#] SOURCE FOLDER? (default=current,not recursive!) \n[<<] ")
+				path=raw_input("[>>] SOURCE FOLDER? (default=current,not recursive!) \n[<<]\t ")
 
 			if path =='':
 				path='./'
@@ -190,30 +193,30 @@ def get_params():
 
 			
 			print(CURSOR_UP_ONE + ERASE_LINE + CURSOR_UP_ONE)
-			print "[<<]",path
+			print "[<<]\t",path
 			path=path+'/' if path[-1] != '/' else path
-			port=raw_input("[#] PORT? (default=1200) \n[<<]")
+			port=raw_input("[>>] PORT? (default=1200) \n[<<]\t")
 			port = 1200 if (port =='' or int(port)<=1000) else int(port)
 
 			print(CURSOR_UP_ONE + ERASE_LINE + CURSOR_UP_ONE)
-			print "[<<]",port
-			message=raw_input("[#] MESSAGE? \n[<<] ")
+			print "[<<]\t",port
+			message=raw_input("[>>] MESSAGE? \n[<<]\t ")
 			message="hi.. i am sending u these" if message == '' else message
 			print(CURSOR_UP_ONE + ERASE_LINE + CURSOR_UP_ONE)
-			print "[<<]",message
+			print "[<<]\t",message
 
 			ip=get_machine_ip()
-			print "[#] YOUR IP:",ip,"(pass this to the receiver)"
+			print "[>>] YOUR IP:",ip,"(pass this to the receiver)"
 		else:
-			host=raw_input("[#] HOST IP? (default=localhost)\n[<<] ")
+			host=raw_input("[>>] HOST IP? (default=localhost)\n[<<]\t ")
 			host = "localhost" if host=='' else host
 
 			print(CURSOR_UP_ONE + ERASE_LINE + CURSOR_UP_ONE)
-			print "[<<]",host
-			port=raw_input("[#] PORT? (default=1200) \n[<<]")
+			print "[<<]\t",host
+			port=raw_input("[>>] PORT? (default=1200) \n[<<]\t")
 			port = 1200 if (port =='' or int(port)<=1000) else int(port)
 			print(CURSOR_UP_ONE + ERASE_LINE + CURSOR_UP_ONE)
-			print "[<<]",port
+			print "[<<]\t",port
 
 
 
@@ -246,23 +249,23 @@ if __name__ == "__main__":
 	
 	if action=='SEND':
 		record=make_record(path,init_port,"record",message)
-		print "[#] WAITING FOR RECIEVER TO CONNECT!"
+		print "[>>] WAITING FOR RECIEVER TO CONNECT!"
 		zcat_send_record("record",init_port)
-		print "[#] FILE LIST SENT"
+		print "[>>] FILE LIST SENT"
 		zcat_send_files(record,init_port+1)
 		print "[!!] COMPLETION WILL NOT BE ACKNOWLEDGED!"
 		pass
 	else:
-		print "[#] CONNECTING..."
+		print "[>>] CONNECTING..."
 		message,record=zcat_get_record("record",host,init_port)
 		print "\n[MESSAGE]:",message,'\n'
-		print "[#] FILES TO BE RECEIVED\n"
+		print "[>>] FILES TO BE RECEIVED\n"
 		show_record(record)
 
-		prompt=raw_input("\n[#] RECEIVE THESE FILES? (y/n): \n[<<] ")
+		prompt=raw_input("\n[>>] RECEIVE THESE FILES? (y/n): \n[<<]\t ")
 		prompt='YES' if prompt in ['y','Y','YES','yes',''] else 'NO'
 		print(CURSOR_UP_ONE + ERASE_LINE + CURSOR_UP_ONE)
-		print "[<<]",prompt
+		print "[<<]\t",prompt
 		if prompt=='YES':
 			zcat_get_files(record,host)
 			print  "[:)]TRANSFER COMPLETE!"
