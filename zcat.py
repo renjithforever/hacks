@@ -112,6 +112,8 @@ def make_record(path,initPortNum,record_fileName="record",message="file list..."
 	record_obj.write(message+'\n')
 	selectAll=raw_input("[#] SELECT ALL FILES IN "+path+' (y/n)\n[<<] ')
 	selectAll=True if selectAll in ['yes','YES','y','Y',''] else False
+	print(CURSOR_UP_ONE + ERASE_LINE + CURSOR_UP_ONE)
+	print "[<<]","YES" if selectAll else "NO"
 
 	for file in files:
 
@@ -123,8 +125,10 @@ def make_record(path,initPortNum,record_fileName="record",message="file list..."
 
 		print "[#] file: ",file
 		if not selectAll:
-			prompt=raw_input("[#] SELECT? (y/n)\n[<<] ")
-			prompt='no' if prompt in ['n','N','NO','no'] else 'yes'
+			prompt=raw_input("\t[#] SELECT? (y/n)\n\t[<<] ")
+			prompt='NO' if prompt in ['n','N','NO','no'] else 'YES'
+			print(CURSOR_UP_ONE + ERASE_LINE + CURSOR_UP_ONE)
+			print "\t[<<]",prompt
 			if prompt=='no':
 				continue
 
