@@ -31,6 +31,8 @@ send files:
 receive files:	
 	python zcat.py -r <host-ip>
 
+___[]____
+[[ascii art: http://patorjk.com/software/taag/]]
 
 """
 import subprocess
@@ -39,6 +41,15 @@ import re
 import sys
 import socket
 
+splash="""
+  _________    _  _____ 
+ |__  / ___|  / \|_   _|
+   / / |     / _ \ | |  
+  / /| |___ / ___ \| |  
+ /____\____/_/   \_\_|  
+[SIMPLE FILE TRANSFER]
+                        
+"""
 
 CURSOR_UP_ONE = '\x1b[1A'
 ERASE_LINE = '\x1b[2K'
@@ -117,7 +128,7 @@ def make_record(path,initPortNum,record_fileName="record",message="file list..."
 	selectAll=True if selectAll in ['yes','YES','y','Y',''] else False
 	print(CURSOR_UP_ONE + ERASE_LINE + CURSOR_UP_ONE)
 	print "[<<]\t","YES" if selectAll else "NO"
-
+	print ""
 	for file in files:
 
 		if file == record_fileName or file[0]=='.' or '.py' in file:
@@ -172,6 +183,7 @@ def get_params():
 				sys.exit()
 		pass
 	else:
+		print splash
 		action=raw_input("[>>] SEND or RECEIVE?\n[<<]\t ")
 		action = "SEND" if (action in ['SEND','send','s','S']) else "RECEIVE"
 		print(CURSOR_UP_ONE + ERASE_LINE + CURSOR_UP_ONE)
@@ -206,7 +218,7 @@ def get_params():
 			print "[<<]\t",message
 
 			ip=get_machine_ip()
-			print "[>>] YOUR IP:",ip,"(pass this to the receiver)"
+			print "\n[>>] YOUR IP:",ip,"(pass this to the receiver)\n"
 		else:
 			host=raw_input("[>>] HOST IP? (default=localhost)\n[<<]\t ")
 			host = "localhost" if host=='' else host
@@ -249,7 +261,7 @@ if __name__ == "__main__":
 	
 	if action=='SEND':
 		record=make_record(path,init_port,"record",message)
-		print "[>>] WAITING FOR RECIEVER TO CONNECT!"
+		print "\n[>>] WAITING FOR RECIEVER TO CONNECT!"
 		zcat_send_record("record",init_port)
 		print "[>>] FILE LIST SENT"
 		zcat_send_files(record,init_port+1)
