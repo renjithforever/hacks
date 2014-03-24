@@ -100,12 +100,9 @@ def make_record(path,initPortNum,record_fileName="record",message="file list..."
 	"""
 
 	files=[]
-	for _,dirs,fileName in os.walk (path):
-		if '.git' in dirs:
-			dirs.remove('.git')
-		if 'test' in dirs:
-			dirs.remove('test')
+	for _,_,fileName in os.walk (path):
 		files.extend(fileName)
+		break
 
 	record={}
 	portNum=initPortNum
@@ -173,7 +170,7 @@ def get_params():
 		print(CURSOR_UP_ONE + ERASE_LINE + CURSOR_UP_ONE)
 		print "[<<]",action
 		if action == "SEND":
-			path=raw_input("[#] SOURCE FOLDER? \n[<<] ")
+			path=raw_input("[#] SOURCE FOLDER? (default=current,not recursive!) \n[<<] ")
 			if path =='':
 				path='./'
 			elif path[-1]!='/':
@@ -197,7 +194,7 @@ def get_params():
 			ip=get_machine_ip()
 			print "[#] YOUR IP:",ip,"(pass this to the receiver)"
 		else:
-			host=raw_input("[#] HOST IP? \n[<<] ")
+			host=raw_input("[#] HOST IP? (default=localhost)\n[<<] ")
 			host = "localhost" if host=='' else host
 
 			print(CURSOR_UP_ONE + ERASE_LINE + CURSOR_UP_ONE)
