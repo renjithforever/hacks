@@ -86,7 +86,7 @@ def zcat_get_files(record,host):
 	for portNum,fileName in record.items():
 		fileName=fileName.split("/")[-1]
 		fileName='"'+fileName
-		print fileName,
+		print "[~] fetching,",fileName,
 		sys.stdout.flush()
 		command="nc "+host+" "+str(portNum)+" >"+fileName
 		process=subprocess.Popen(command,shell=True, stdout=subprocess.PIPE)
@@ -214,8 +214,8 @@ def get_params():
 
 	
 def show_record(record):
-	for fileName in record.values():
-		print fileName.split("/")[-1], '\t',
+	for i,fileName in list(enumerate(record.values())):
+		print (i+1),'"'+fileName.split("/")[-1], '\t',
 
 	print ""
 	
@@ -242,7 +242,7 @@ if __name__ == "__main__":
 		zcat_send_record("record",init_port)
 		print "[#] FILE LIST SENT"
 		zcat_send_files(record,init_port+1)
-		print "[note] COMPLETION WILL NOT BE ACKNOWLEDGED!"
+		print "[!!] COMPLETION WILL NOT BE ACKNOWLEDGED!"
 		pass
 	else:
 		print "[#] CONNECTING..."
