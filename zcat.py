@@ -85,7 +85,7 @@ def zcat_get_record(record_fileName,host,portNum):
 	message=record_obj.readline()
 
 	if message=='':
-		sys.exit("[!] NOTHING TO RECEIVE")
+		sys.exit("[!!] NOTHING TO RECEIVE")
 
 	for line in record_obj:
 		line=line.strip().split(":")
@@ -100,7 +100,7 @@ def zcat_get_files(record,host):
 	for portNum,fileName in record.items():
 		fileName=fileName.split("/")[-1]
 		fileName='"'+fileName
-		print "[~] fetching,",fileName,
+		print "[%%] fetching,",fileName,
 		sys.stdout.flush()
 		command="nc "+host+" "+str(portNum)+" >"+fileName
 		process=subprocess.Popen(command,shell=True, stdout=subprocess.PIPE)
@@ -143,7 +143,7 @@ def make_record(path,initPortNum,record_fileName="record",message="file list..."
 			prompt='NO' if prompt in ['n','N','NO','no'] else 'YES'
 			print(CURSOR_UP_ONE + ERASE_LINE + CURSOR_UP_ONE)
 			print "\t[<<]\t",prompt
-			if prompt=='no':
+			if prompt=='NO':
 				continue
 
 		record[portNum]=file
@@ -192,8 +192,9 @@ def get_params():
 			path=raw_input("[>>] SOURCE FOLDER? (default=current,not recursive!) \n[<<]\t ")
 			path='.' if path=='' or path=="current" else path
 			while(not os.path.isdir(path)):
-				print "[!] SORRY, NOT A FOLDER. TRY AGAIN!"
+				print "[!!] SORRY, NOT A FOLDER. TRY AGAIN!"
 				path=raw_input("[>>] SOURCE FOLDER? (default=current,not recursive!) \n[<<]\t ")
+				path='.' if path=='' or path=="current" else path
 
 			if path =='':
 				path='./'
